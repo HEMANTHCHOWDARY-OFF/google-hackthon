@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalize Your Journey - PrepTracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="styles/modern-theme.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: var(--aesthetic-bg-subtle);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .interests-card {
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: var(--soft-shadow);
+            padding: 2.5rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--aesthetic-border);
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: var(--aesthetic-text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+        }
+
+        .btn-select-all {
+            font-size: 0.85rem;
+            color: var(--aesthetic-primary);
+            background: transparent;
+            border: 1px solid var(--aesthetic-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-select-all:hover {
+            background: var(--aesthetic-primary);
+            color: white;
+        }
+
+        .interest-groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .interest-pill {
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            border: 1.5px solid var(--aesthetic-border);
+            background: white;
+            color: var(--aesthetic-text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .interest-pill:hover {
+            border-color: var(--aesthetic-primary);
+            color: var(--aesthetic-primary);
+            background: #f5f3ff;
+            transform: translateY(-1px);
+        }
+
+        .interest-pill.active {
+            background-color: var(--aesthetic-primary);
+            border-color: var(--aesthetic-primary);
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 29, 149, 0.2);
+        }
+
+        .btn-save-container {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 1.5rem 0;
+            border-top: 1px solid var(--aesthetic-border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-save {
+            background-color: var(--aesthetic-primary);
+            color: white;
+            padding: 1rem 4rem;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(76, 29, 149, 0.2);
+        }
+
+        .btn-save:hover {
+            background-color: #3b1675;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 29, 149, 0.3);
+        }
+
+        .btn-save:disabled {
+            background-color: #a78bfa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        @media (max-width: 768px) {
+            .interest-groups {
+                grid-template-columns: 1fr;
+            }
+
+            .interests-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="interests-card">
+        <div class="text-center mb-5">
+            <div class="mb-3" style="color: var(--aesthetic-primary); font-size: 2.5rem;">
+                <i class="fas fa-sparkles"></i>
+            </div>
+            <h2 class="fw-bold">Personalize Your Prep</h2>
+            <p class="text-muted">Select the topics you want to track. You can always change these later.</p>
+        </div>
+
+        <div id="interests-container" class="interest-groups">
+            <!-- Dynamic sections will be injected here -->
+            <div class="text-center w-100 py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="btn-save-container">
+            <button id="btn-save" class="btn-save" disabled>
+                Save & Continue <i class="fas fa-arrow-right ms-2"></i>
+            </button>
+            <p id="selection-count" class="text-muted small mb-0">No topics selected</p>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container"></div>
+
+    <!-- Firebase SDKs -->
+    <script type="module" src="scripts/interests.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,698 @@
+/* Minimalist Aesthetic Theme (Subtle, Smooth, Clean) */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    /* Base Colors - Inspired by Vercel / Linear */
+    --aesthetic-bg: #fdfdfd;
+    --aesthetic-bg-subtle: #f8f9fa;
+    --aesthetic-text: #1d1d1f;
+    --aesthetic-text-muted: #6e6e73;
+    /* Updated Color Palette: "Deep Violet" */
+    --aesthetic-accent: #5b21b6;
+    /* Vivid Violet for icons/highlights */
+    --aesthetic-primary: #4c1d95;
+    /* Deep Purple for buttons */
+    --aesthetic-border: #e5e7eb;
+    --aesthetic-sidebar-bg: #ffffff;
+
+    /* Soft Shadows */
+    --soft-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --hover-shadow: 0 10px 15px -3px rgba(76, 29, 149, 0.15), 0 4px 6px -2px rgba(76, 29, 149, 0.1);
+
+    --font-main: "Outfit", -apple-system, system-ui, sans-serif;
+}
+
+/* --- Dark Theme Overrides --- */
+[data-theme="dark"] {
+    --aesthetic-bg: #0f172a;
+    /* Deep Slate Blue/Black */
+    --aesthetic-bg-subtle: #1e293b;
+    /* Lighter Slate for containers */
+    --aesthetic-text: #f8fafc;
+    /* Off-white text */
+    --aesthetic-text-muted: #94a3b8;
+    /* Muted Blue-Grey */
+    --aesthetic-sidebar-bg: #0f172a;
+    /* Match main bg */
+    --aesthetic-border: #334155;
+    /* Darker border */
+    --aesthetic-accent: #8b5cf6;
+    /* Lighter Violet for dark mode */
+
+    /* Adjust shadow for dark mode visibility */
+    --soft-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .bg-white {
+    background-color: var(--aesthetic-bg-subtle) !important;
+    color: var(--aesthetic-text);
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: var(--aesthetic-bg) !important;
+    color: var(--aesthetic-text);
+}
+
+[data-theme="dark"] .text-secondary,
+[data-theme="dark"] .text-muted {
+    color: var(--aesthetic-text-muted) !important;
+}
+
+[data-theme="dark"] .navbar,
+[data-theme="dark"] .card,
+[data-theme="dark"] .doc-card,
+[data-theme="dark"] .list-group-item {
+    background-color: var(--aesthetic-bg-subtle) !important;
+    color: var(--aesthetic-text);
+    border-color: var(--aesthetic-border);
+}
+
+[data-theme="dark"] .progress {
+    background-color: var(--aesthetic-border);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--aesthetic-bg) !important;
+    color: var(--aesthetic-text) !important;
+    border-color: var(--aesthetic-border) !important;
+}
+
+[data-theme="dark"] .table {
+    color: var(--aesthetic-text);
+    border-color: var(--aesthetic-border);
+}
+
+body {
+    background-color: var(--aesthetic-bg-subtle);
+    color: var(--aesthetic-text);
+    font-family: var(--font-main);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+/* Animations */
+* {
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* --- Sidebar Styling --- */
+#wrapper {
+    overflow-x: hidden;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    margin-left: -15rem;
+    transition: margin 0.3s ease-in-out;
+    background-color: var(--aesthetic-sidebar-bg);
+    border-right: 1px solid var(--aesthetic-border);
+    width: 15rem;
+    position: fixed;
+    z-index: 1000;
+    box-shadow: var(--soft-shadow);
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: 0;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    margin-left: 0;
+    transition: margin 0.3s ease-in-out;
+    /* padding-left: 15rem;  This logic depends on toggle state, usually JS calls .toggled on wrapper. 
+      Assuming defaults: if Untoggled (hidden), margin is -15rem. If Toggled (shown), margin is 0. 
+      Wait, typical bootstrap sidebar template:
+      Mobile: Hidden by default (margin -15rem).
+      Desktop: Visible by default? 
+      Let's assume standard behavior:
+      If #wrapper has class 'toggled', sidebar is visible.
+   */
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: 0;
+        /* Visible on desktop by default */
+    }
+
+    #page-content-wrapper {
+        min-width: 0;
+        width: 100%;
+        margin-left: 15rem;
+        /* Push content */
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: -15rem;
+        /* Hide is toggle is clicked */
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* Sidebar Links */
+.sidebar-heading {
+    padding: 2rem 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--aesthetic-text);
+    letter-spacing: -0.02em;
+    border-bottom: 1px solid var(--aesthetic-border);
+}
+
+.list-group-item {
+    border: none;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+    color: var(--aesthetic-text-muted);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    border-left: 3px solid transparent;
+}
+
+.list-group-item i {
+    width: 24px;
+    opacity: 0.7;
+    transition: transform 0.2s;
+}
+
+.list-group-item:hover {
+    color: var(--aesthetic-accent);
+    background-color: #f9f9fa;
+    padding-left: 1.75rem;
+    /* Slide effect */
+}
+
+.list-group-item:hover i {
+    transform: scale(1.1);
+}
+
+.list-group-item.active {
+    color: var(--aesthetic-primary);
+    /* Violet text */
+    background-color: #f5f3ff;
+    /* Very light purple bg */
+    border-left-color: var(--aesthetic-primary);
+    font-weight: 600;
+}
+
+/* --- Hero Section --- */
+.doc-hero {
+    background: transparent;
+    /* Seamless blend */
+    padding: 3rem 0;
+    margin-bottom: 2rem;
+    text-align: left;
+    border-bottom: none;
+}
+
+.doc-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+}
+
+.doc-hero p {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--aesthetic-text-muted);
+}
+
+/* --- Cards (Neumorphic Lite) --- */
+.doc-card {
+    background: var(--aesthetic-sidebar-bg);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    /* Barely visible border */
+    border-radius: 16px;
+    /* Smooth curves */
+    padding: 2rem;
+    box-shadow: var(--soft-shadow);
+    height: 100%;
+}
+
+.doc-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.doc-card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--aesthetic-text-muted);
+    margin-bottom: 1rem;
+}
+
+.doc-stat-value {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: var(--aesthetic-text);
+    letter-spacing: -0.03em;
+}
+
+/* Charts Area */
+canvas {
+    filter: saturate(90%);
+    /* Mutate colors slightly for vibe */
+}
+
+/* Form Elements - Rounded & Soft */
+.form-control,
+.form-select {
+    border-radius: 12px;
+    border: 1px solid var(--aesthetic-border);
+    background-color: var(--aesthetic-bg-subtle);
+    color: var(--aesthetic-text);
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #fff;
+    border-color: #ccc;
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.05);
+    /* Soft glow */
+}
+
+/* Buttons - Minimalist */
+.btn-doc-primary {
+    background-color: var(--aesthetic-primary);
+    color: white;
+    border-radius: 12px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border: none;
+    letter-spacing: 0.02em;
+}
+
+.btn-doc-primary:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Layout Utilities */
+.doc-container {
+    max-width: 1400px;
+    padding: 0 3rem;
+    margin: 0 auto;
+}
+
+.main-content-wrapper {
+    padding-top: 1rem;
+    padding-bottom: 5rem;
+}
+
+/* Navbar (Top) */
+.navbar {
+    background-color: var(--aesthetic-bg-subtle) !important;
+    /* Blend with body */
+    box-shadow: none !important;
+    border-bottom: 1px solid transparent;
+}
+
+.navbar h2 {
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+}
+
+#nav-placeholder .bg-white {
+    background-color: var(--aesthetic-bg-subtle) !important;
+}
+
+/* Utilities */
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-info {
+    color: #3b82f6 !important;
+}
+
+/* --- Split Screen Login Layout --- */
+.login-container {
+    display: flex;
+    width: 1200px;
+    max-width: 95vw;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    min-height: 500px;
+    /* Reduced to 500px */
+}
+
+.login-left {
+    flex: 1;
+    background: #0f1025;
+    /* Dark Navy/Black */
+    background: linear-gradient(135deg, #1a1b41 0%, #0f1025 100%);
+    position: relative;
+    padding: 2rem;
+    /* Reduced to 2rem */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: white;
+    /* Diagonal cut effect could be complex, using simple gradient/image for now or clip-path if needed. 
+       The image shows a diagonal white overlay. Let's try a pseudo-element. */
+}
+
+/* Diagonal Overlay/Shape */
+.login-left::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    pointer-events: none;
+    /* This is hard to perfect without SVG. Let's simple clip the right side? 
+       Actually, the right side (white) cuts into the left. */
+}
+
+/* Re-implement diagonal using the container or clip-path on the left child */
+/* Simpler approach: Just a clean split for now, maybe add a diagonal divider image if time permits. */
+
+.login-brand {
+    font-size: 1.4rem;
+    /* Slightly smaller */
+    font-weight: 700;
+    color: #fff;
+    z-index: 2;
+}
+
+.login-illustration {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.login-illustration img {
+    max-width: 100%;
+    max-height: 280px;
+    /* Reduced from 350px */
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+}
+
+.login-right {
+    flex: 1;
+    background: #fff;
+    padding: 2rem;
+    /* Reduced from 3rem */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Diagonal cut attempt using clip-path on the right panel? 
+   Or better, a pseudo-element on the left panel that is white and slanted. */
+.login-container {
+    background-color: #0f1025;
+    /* Match left bg so it shows through */
+}
+
+.login-left {
+    width: 55%;
+    /* Give it more space */
+    flex: unset;
+}
+
+.login-right {
+    width: 45%;
+    flex: unset;
+    background: #fdfdfd;
+    clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+    margin-left: -50px;
+    /* Overlap */
+    padding-left: 4rem;
+    /* Compensate for slant */
+}
+
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        width: 100%;
+        min-height: auto;
+    }
+
+    .login-left {
+        width: 100%;
+        padding: 2rem;
+        min-height: 200px;
+    }
+
+    .login-right {
+        width: 100%;
+        clip-path: none;
+        margin-left: 0;
+        padding: 2rem;
+    }
+
+    .login-illustration {
+        display: none;
+        /* Hide on mobile to save space or keep small */
+    }
+}
+
+.login-form-wrapper {
+    width: 100%;
+    max-width: 320px;
+}
+
+.form-control {
+    background-color: #f3f4f6;
+    border: none;
+    padding: 0.8rem 1rem;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 2px var(--aesthetic-primary);
+}
+
+.input-group-text,
+.btn-outline-secondary {
+    background-color: #f3f4f6;
+    border: none;
+}
+
+.input-group:focus-within .btn-outline-secondary,
+.input-group:focus-within .form-control {
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.btn-doc-primary {
+    background-color: #4c1d95;
+    /* Deep Violet */
+    border-radius: 8px;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* --- Scoped Compact Tracker Styles --- */
+.compact-tracker .doc-hero {
+    padding: 2rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.compact-tracker .doc-card {
+    padding: 1.5rem;
+}
+
+.compact-tracker .form-control,
+.compact-tracker .form-select {
+    padding: 0.5rem 0.8rem;
+}
+
+.compact-tracker .btn-doc-primary {
+    padding: 0.6rem 1.2rem;
+}
+
+/* Custom Component Colors */
+.topic-mastery-card {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .topic-mastery-card {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.weak-areas-card {
+    background-color: #fff8f8;
+    border-color: #fca5a5;
+}
+
+[data-theme="dark"] .weak-areas-card {
+    background-color: rgba(220, 53, 69, 0.05);
+    /* Subtle red bg */
+    border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* --- Profile Modal Styling --- */
+.profile-modal-content {
+    border-radius: 24px;
+    border: 1px solid var(--aesthetic-border);
+    background-color: var(--aesthetic-sidebar-bg);
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.profile-avatar-container {
+    position: relative;
+    display: inline-block;
+    padding: 10px;
+    background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+    border-radius: 50%;
+}
+
+[data-theme="dark"] .profile-avatar-container {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+.profile-avatar {
+    font-size: 5rem;
+    color: var(--aesthetic-primary);
+    line-height: 1;
+}
+
+.profile-info-grid {
+    background: var(--aesthetic-bg-subtle);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.info-item label {
+    display: block;
+    margin-bottom: 2px;
+    letter-spacing: 0.05em;
+}
+
+.info-item p {
+    color: var(--aesthetic-text);
+    font-weight: 500;
+}
+
+.interests-summary span {
+    background: #fff;
+    border: 1px solid var(--aesthetic-border);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .interests-summary span {
+    background: var(--aesthetic-bg);
+}
+
+.modal-header .btn-close {
+    background-color: var(--aesthetic-bg-subtle);
+    border-radius: 50%;
+    padding: 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* --- Toast Notifications --- */
+.toast-container {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    pointer-events: none;
+}
+
+.toast-container .alert {
+    pointer-events: auto;
+    min-width: 300px;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.25rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s ease;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast-container .alert.fade-out {
+    opacity: 0;
+    transform: translateX(20px);
+}
+
+/* --- Progress Bar --- */
+.upload-progress-container {
+    margin-top: 1rem;
+    background: var(--aesthetic-bg-subtle);
+    border-top: 1px solid var(--aesthetic-border);
+    padding-top: 1.5rem;
+    display: none;
+    /* Shown during upload */
+}
+
+.progress {
+    height: 8px;
+    background-color: var(--aesthetic-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: var(--aesthetic-primary);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--aesthetic-text-muted);
+    font-weight: 500;
+    margin-top: 0.5rem;
+    text-align: center;
+}
