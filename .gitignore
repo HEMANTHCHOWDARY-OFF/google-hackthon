@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# OS misc
+.DS_Store
+Thumbs.db
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# Documentation / Notes
+progress_upto_now.txt

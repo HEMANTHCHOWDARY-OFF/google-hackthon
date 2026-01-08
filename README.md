@@ -1,83 +1,51 @@
 # Placement Prep Tracker 🎓
 
-A "Smart Readiness Dashboard" to help students track their placement preparation, built for the Google Hackathon. 
+A **Smart Readiness Dashboard** designed to help students track and optimize their placement preparation journey.
 
-**Tech Stack**: Vanilla JS, Bootstrap 5, Chart.js, Firebase v9 (Auth, Firestore, Storage).
+> **Status**: 🟢 Feature Complete (MVP Ready)
+> 
+> **Live Demo**: [https://google-hackthon-final.vercel.app/](https://google-hackthon-final.vercel.app/)
 
-## 📂 File Structure
+## 🚀 Key Features
 
-```text
-Google Hackathon/
-├── index.html            # Entry point (Redirects to login)
-├── login.html            # Google/Email Auth
-├── register.html         # User Registration
-├── dashboard.html        # Main Stats, Readiness Score, Weak Areas
-├── daily-tracker.html    # CRUD Tasks + Study Session Logger
-├── resume-vault.html     # PDF Uploads to Firebase Storage
-├── mock-interviews.html  # Interview Logs
-├── analytics.html        # Future charts placeholder
-├── styles/
-│   └── main.css          # Glassmorphism & Sidebar styles
-└── scripts/
-    ├── app.js            # Main router (legacy/helper)
-    ├── auth-guard.js     # Security middleware (redirects if not logged in)
-    ├── dashboard.js      # Readiness Score & Chart.js logic
-    ├── firebase-config.js# Firebase Initialization (API Keys)
-    ├── interviews.js     # Firestore logic for Mock Interviews
-    ├── nav.js            # Shared Sidebar/Navbar component
-    ├── study-logger.js   # Logic to log study hours
-    ├── tracker.js        # Logic for Daily Tasks
-    └── vault.js          # Logic for Resume Uploads
-```
+*   **📊 Smart Dashboard**: Auto-calculates your "Readiness Score" and automatically flags weak areas (subjects with < 2 hours study).
+*   **📝 Activity Tracker**: 
+    *   **Daily Tasks**: Manage your to-do list with 'DSA', 'Aptitude', and 'Core CS' categories.
+    *   **Study Logger**: Log hours to feed the readiness algorithm.
+    *   **Code Submissions**: Upload daily code snippets directly to the cloud.
+*   **💼 Resume Vault**: Securely store and manage multiple versions of your CV.
+*   **🗣️ Mock Interview Log**: Track your interview performance and feedback.
+*   **🎨 Modern UI**: Features a "Deep Violet" aesthetic with Neumorphic cards and smooth animations.
 
-## 🚀 Features
+## 🛠️ Tech Stack
 
-1.  **Readiness Score**: Auto-calculated based on your completed tasks vs. total tasks.
-2.  **Weak Area Detection**: Highlights subjects where you have < 50% tasks done or < 2 hours studied.
-3.  **Resume Vault**: Securely store and version your CVs using Firebase Storage.
-4.  **Mock Logs**: Keep a history of your mock interviews and scores.
-5.  **Multi-Page App**: Clean, separable files for easy navigation and maintenance.
+*   **Frontend**: Vanilla JavaScript (ES Modules), HTML5
+*   **Styling**: Bootstrap 5 + Custom Design System (`modern-theme.css`)
+*   **Backend**: Firebase v9 (Auth, Firestore, Storage)
+*   **Visualization**: Chart.js
 
-## 🛠️ How to Run Locally
+## 💻 How to Run Locally
 
-Since the project uses ES Modules (`import/export`), you cannot just double-click HTML files. You need a local server.
+Since this project uses ES Modules, it requires a local server.
 
-1.  **Install a server** (if you have Node.js):
+1.  **install http-server**:
     ```bash
     npm install -g http-server
     ```
+
 2.  **Start the server**:
     ```bash
-    npx http-server .
+    npx http-server . -p 8080
     ```
+
 3.  **Open in Browser**:
-    Go to `http://localhost:8080`.
+    Go to `http://localhost:8080`
 
-## 🔥 Firebase Deployment
+## 🔥 Firebase Configuration
 
-This project is ready for Firebase Hosting.
+This app uses Firebase for backend services. Configuration is handled in `scripts/firebase-config.js`.
 
-1.  **Install Firebase CLI**:
-    ```bash
-    npm install -g firebase-tools
-    ```
-
-2.  **Login**:
-    ```bash
-    firebase login
-    ```
-
-3.  **Initialize**:
-    ```bash
-    firebase init hosting
-    ```
-    *   **Public directory**: Type `.` (current directory) or `public` if you move files there.
-    *   **Configure as single-page app?**: No (since we use distinct .html files).
-    *   **Set up automatic builds?**: No.
-
-4.  **Deploy**:
-    ```bash
-    firebase deploy
-    ```
-
-Your app will be live at `https://placement-tracker-code-quartet.web.app`!
+**Security Note**: For production, ensure Firestore Security Rules are configured to allow access only to the data owner:
+```javascript
+allow read, write: if request.auth != null && request.auth.uid == resource.data.uid;
+```
