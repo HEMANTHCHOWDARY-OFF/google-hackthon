@@ -95,17 +95,72 @@ export function initAiMentor(container) {
             return "Here are the questions I can answer:\n\n" + list;
         }
 
-        // Find matching question
-        // 1. Check if user text contains the question (e.g. "Can you answer Tell me about yourself")
-        // 2. Check if question contains the user text (e.g. "Strengths") - requires minimum length to avoid matching "the"
-        const matched = INTERVIEW_QA.find(q => {
+        // Improved matching logic with scoring
+        let bestMatch = null;
+        let highestScore = 0;
+
+        // Common stop words to ignore in fuzzy matching
+        const stopWords = new Set(['what', 'is', 'are', 'do', 'does', 'did', 'can', 'could', 'should', 'would', 'the', 'a', 'an', 'and', 'or', 'of', 'to', 'in', 'on', 'at', 'by', 'for', 'with', 'me', 'my', 'we', 'us', 'it', 'this', 'that']);
+
+        // Tokenize user input
+        const userTokens = normalizedText.replace(/[?.,]/g, '').split(/\s+/);
+        const importantUserTokens = userTokens.filter(t => !stopWords.has(t));
+
+        INTERVIEW_QA.forEach(q => {
             const qText = q.question.toLowerCase().replace(/[?.,]/g, '');
-            const uText = normalizedText.replace(/[?.,]/g, '');
-            return uText.includes(qText) || (uText.length > 5 && qText.includes(uText));
+            const qTokens = qText.split(/\s+/);
+            const importantQTokens = qTokens.filter(t => !stopWords.has(t));
+
+            let currentScore = 0;
+
+            // 1. Exact phrase match (very high score)
+            // Prioritize implementation of strict matches
+            if (qText === normalizedText) currentScore += 100;
+            if (normalizedText.includes(qText)) currentScore += 50;
+            // Only give substring bonus if it's a significant match (not just one word like "what")
+            if (qText.includes(normalizedText) && normalizedText.length > 5) currentScore += 50;
+
+            // 2. Token overlap score (Fuzzy match)
+            // Use important tokens for finding the best semantic match
+            let matchedTokens = 0;
+
+            if (importantUserTokens.length > 0) {
+                importantUserTokens.forEach(uToken => {
+                    const isDirectMatch = importantQTokens.includes(uToken);
+
+                    if (isDirectMatch) {
+                        matchedTokens += 1.0;
+                    } else {
+                        // Check for partial matches (e.g. "self" matching "yourself")
+                        const partialMatch = importantQTokens.some(qToken =>
+                            (qToken.includes(uToken) && uToken.length > 3) ||
+                            (uToken.includes(qToken) && qToken.length > 3)
+                        );
+                        if (partialMatch) matchedTokens += 0.5;
+                    }
+                });
+
+                // Calculate score based on percentage of IMPORTANT user words matched
+                const coverageScore = (matchedTokens / importantUserTokens.length) * 20;
+                currentScore += coverageScore;
+            } else {
+                // If no important tokens (e.g. "Who are you"), rely on basic tokens
+                // but give them less weight
+                userTokens.forEach(uToken => {
+                    if (qTokens.includes(uToken)) matchedTokens += 0.5;
+                });
+                currentScore += matchedTokens;
+            }
+
+            if (currentScore > highestScore) {
+                highestScore = currentScore;
+                bestMatch = q;
+            }
         });
 
-        if (matched) {
-            return matched.answer;
+        // Threshold for acceptance
+        if (bestMatch && highestScore >= 10) {
+            return bestMatch.answer;
         }
 
         return "I'm not sure about that one yet. I can only answer specific interview questions from my list. Type 'list' to see what I can answer.";
