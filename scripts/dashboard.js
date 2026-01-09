@@ -1,6 +1,7 @@
 import { db, auth } from './firebase-config.js';
 import { collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { TOPICS_MASTER } from './master-data.js';
+import { animateCounter, typeText, staggeredFadeIn, animateProgressBar, initializeAnimations } from './animations.js';
 
 export async function initDashboard(user) {
     console.log("[Dashboard] Initializing for user:", user.uid);
@@ -11,12 +12,17 @@ export async function initDashboard(user) {
         return;
     }
 
+    // 1. Get user name for greeting
+    const userName = user.displayName || "User";
+
     // 1. Inject UI Structure (Hero + Grid + Cards)
     container.innerHTML = `
-        <div class="doc-hero">
+        <div class="doc-hero" style="padding: 4rem 0 3rem;">
             <div class="doc-container">
-                <h1>Ready for Placement?</h1>
-                <p>Track your daily progress, analyze weak areas, and log your journey to success.</p>
+                <div id="greeting-container" style="margin-bottom: 2rem;">
+                    <h1 id="animated-greeting" style="font-size: 3rem; margin-bottom: 0.5rem; min-height: 80px;"></h1>
+                    <p id="animated-subtitle" style="opacity: 0; font-size: 1.2rem;">Track your daily progress, analyze weak areas, and log your journey to success.</p>
+                </div>
             </div>
         </div>
 
@@ -118,7 +124,13 @@ export async function initDashboard(user) {
         </div>
     `;
 
-    // 2. Fetch Data & Render Logic
+    // 2. Animate the greeting with split text effect
+    animateSplitText(userName);
+
+    // 2.5. Initialize animations
+    initializeAnimations();
+
+    // 3. Fetch Data & Render Logic
     try {
         await loadDashboardData(user);
     } catch (err) {
@@ -133,6 +145,61 @@ export async function initDashboard(user) {
     }
 }
 
+function animateSplitText(userName) {
+    const greetingEl = document.getElementById('animated-greeting');
+    const subtitleEl = document.getElementById('animated-subtitle');
+
+    if (!greetingEl) return;
+
+    // Create the full text: "Hi John, Welcome Back!"
+    const fullText = `Hi ${userName} Welcome Back to Prep Tracker`;
+
+    // Split into individual characters
+    const chars = fullText.split('');
+
+    // Clear the element
+    greetingEl.innerHTML = '';
+
+    // Create a span for each character
+    chars.forEach((char, index) => {
+        const span = document.createElement('span');
+
+        if (char === ' ') {
+            span.innerHTML = '&nbsp;';
+        } else {
+            span.textContent = char;
+        }
+
+        span.style.opacity = '0';
+        span.style.display = 'inline-block';
+        span.style.transform = 'translateY(20px)';
+        span.style.transition = 'all 0.5s ease';
+
+        // Add gradient color effect
+        if (char !== ' ' && char !== ',' && char !== '!') {
+            const hue = 250 + (index * 5); // Purple to violet gradient
+            span.style.background = `linear-gradient(135deg, hsl(${hue}, 70%, 50%), hsl(${hue + 20}, 80%, 60%))`;
+            span.style.webkitBackgroundClip = 'text';
+            span.style.backgroundClip = 'text';
+            span.style.webkitTextFillColor = 'transparent';
+        }
+
+        greetingEl.appendChild(span);
+
+        // Animate each character with staggered delay
+        setTimeout(() => {
+            span.style.opacity = '1';
+            span.style.transform = 'translateY(0)';
+        }, index * 50); // 50ms delay between each character
+    });
+
+    // Animate subtitle with typing effect after greeting is done
+    setTimeout(() => {
+        const subtitleText = 'Track your daily progress, analyze weak areas, and log your journey to success.';
+        typeText(subtitleEl, subtitleText, 30);
+    }, chars.length * 50 + 300);
+}
+
 async function loadDashboardData(user) {
     console.log("[Dashboard] Fetching data...");
 
@@ -142,7 +209,7 @@ async function loadDashboardData(user) {
     const tasks = tasksSnapshot.docs.map(doc => doc.data());
 
     console.log(`[Dashboard] Found ${tasks.length} tasks.`);
-    document.getElementById('active-tasks').innerText = tasks.length;
+    animateCounter(document.getElementById('active-tasks'), tasks.length, 1500);
 
     // --- 2. Fetch Study Logs (From subcollection) ---
     const logsQ = query(collection(db, "users", user.uid, "dailyLogs"));
@@ -151,12 +218,12 @@ async function loadDashboardData(user) {
 
     // Calculate Total Hours
     const totalHours = logs.reduce((acc, curr) => acc + (curr.hours || 0), 0);
-    document.getElementById('total-hours').innerText = totalHours.toFixed(1);
+    animateCounter(document.getElementById('total-hours'), totalHours, 1800, '');
 
     // --- 3. Fetch Mocks ---
     const mocksQ = query(collection(db, "mock_interviews"), where("userId", "==", user.uid));
     const mocksSnapshot = await getDocs(mocksQ);
-    document.getElementById('total-mocks').innerText = mocksSnapshot.size;
+    animateCounter(document.getElementById('total-mocks'), mocksSnapshot.size, 1600);
 
     // --- 4. Logic & Calculations ---
 
@@ -183,12 +250,14 @@ async function loadDashboardData(user) {
     const readiness = totalPossible > 0 ? ((totalCompleted / totalPossible) * 100).toFixed(1) : "0.0";
 
     const scoreEl = document.getElementById('readiness-score');
-    scoreEl.innerText = `${readiness}%`;
+    animateCounter(scoreEl, parseFloat(readiness), 2000, '%');
 
-    // Color code the score
-    if (readiness >= 75) scoreEl.style.color = '#198754'; // success
-    else if (readiness >= 40) scoreEl.style.color = '#ffc107'; // warning
-    else scoreEl.style.color = '#dc3545'; // danger
+    // Color code the score (apply after animation completes)
+    setTimeout(() => {
+        if (readiness >= 75) scoreEl.style.color = '#198754'; // success
+        else if (readiness >= 40) scoreEl.style.color = '#ffc107'; // warning
+        else scoreEl.style.color = '#dc3545'; // danger
+    }, 2100);
 
     // Subject Proficiency Chart (Based on Mastery %)
     const chartLabels = interests.length > 0 ? interests : ['DSA', 'Aptitude', 'Core CS'];
@@ -232,7 +301,7 @@ async function renderTopicMastery(user, progressData, interests) {
     }
 
     list.innerHTML = '';
-    interests.forEach(subject => {
+    interests.forEach((subject, index) => {
         const completedTopics = progressData[subject] || [];
         const allTopics = TOPICS_MASTER[subject] || [];
         const total = allTopics.length;
@@ -248,7 +317,7 @@ async function renderTopicMastery(user, progressData, interests) {
                         <span class="badge bg-primary">${percentage}%</span>
                     </div>
                     <div class="progress" style="height: 8px;">
-                        <div class="progress-bar" role="progressbar" style="width: ${percentage}%" 
+                        <div class="progress-bar" role="progressbar" style="width: 0%" 
                              aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                     <div class="mt-2 small text-muted">
@@ -257,6 +326,12 @@ async function renderTopicMastery(user, progressData, interests) {
                 </div>
             `;
         list.appendChild(col);
+
+        // Animate progress bar with delay
+        setTimeout(() => {
+            const progressBar = col.querySelector('.progress-bar');
+            animateProgressBar(progressBar, parseFloat(percentage), 1500);
+        }, 300 + (index * 150));
     });
 }
 
@@ -288,6 +363,17 @@ function renderChart(labels, data) {
             },
             plugins: {
                 legend: { display: false }
+            },
+            animation: {
+                delay: (context) => {
+                    let delay = 0;
+                    if (context.type === 'data' && context.mode === 'default' && !context.dropped) {
+                        delay = context.dataIndex * 300 + context.datasetIndex * 100;
+                    }
+                    return delay;
+                },
+                duration: 2000,
+                easing: 'easeOutQuart'
             }
         }
     });
@@ -356,23 +442,40 @@ function identifyWeakAreas(tasks, logs, progressData, interests) {
     const typeOrder = { 'danger': 0, 'warning': 1, 'info': 2 };
     recommendations.sort((a, b) => typeOrder[a.type] - typeOrder[b.type]);
 
-    const renderItem = (container, rec) => {
+    const renderItem = (container, rec, index) => {
         const div = document.createElement('div');
         const bgColor = rec.type === 'danger' ? 'bg-danger' : (rec.type === 'warning' ? 'bg-warning' : 'bg-info');
         const textColor = rec.type === 'danger' ? 'text-danger' : (rec.type === 'warning' ? 'text-warning' : 'text-info');
 
         div.className = `alert m-0 py-2 px-3 border-0 ${bgColor} bg-opacity-10 ${textColor} d-flex flex-column mb-2`;
+        div.style.opacity = '0';
+        div.style.transform = 'translateY(10px)';
+        div.style.transition = 'all 0.5s ease';
+        div.style.cursor = 'pointer'; // Make it look clickable
+
         div.innerHTML = `
             <div class="d-flex align-items-center fw-bold small">
                 <i class="fas ${rec.type === 'danger' ? 'fa-exclamation-triangle' : 'fa-lightbulb'} me-2"></i> ${rec.subject}
             </div>
             <div class="small opacity-75 ms-4">${rec.reason}</div>
         `;
+
+        // Add click event to navigate
+        div.addEventListener('click', () => {
+            window.location.href = `daily-tracker.html?subject=${encodeURIComponent(rec.subject)}`;
+        });
+
         container.appendChild(div);
+
+        // Trigger animation
+        setTimeout(() => {
+            div.style.opacity = '1';
+            div.style.transform = 'translateY(0)';
+        }, index * 100);
     };
 
     const visibleCount = 5;
-    recommendations.slice(0, visibleCount).forEach(rec => renderItem(list, rec));
+    recommendations.slice(0, visibleCount).forEach((rec, i) => renderItem(list, rec, i));
 
     if (recommendations.length > visibleCount) {
         const hiddenContainer = document.createElement('div');

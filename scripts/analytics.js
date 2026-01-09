@@ -101,7 +101,7 @@ async function loadAnalyticsData(user) {
             // Monthly Trends
             if (d.timestamp) {
                 const date = d.timestamp.toDate();
-                const dateKey = date.toISOString().split('T')[0];
+                const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                 dailyMinutes[dateKey] = (dailyMinutes[dateKey] || 0) + (hours * 60);
 
                 if (date.getFullYear() === currentYear) {
@@ -312,25 +312,36 @@ function renderProductivityHeatmap(dailyMinutes) {
 
     container.innerHTML = '';
     const now = new Date();
-    // Show last 28 days
-    for (let i = 27; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(now.getDate() - i);
-        const key = d.toISOString().split('T')[0];
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const todayDay = now.getDate();
+
+    // Iterate through all days of the current month
+    for (let day = 1; day <= daysInMonth; day++) {
+        const key = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const minutes = dailyMinutes[key] || 0;
 
-        let color = '#f8f9fa'; // empty
-        if (minutes > 0) color = '#d1e7dd';
-        if (minutes > 60) color = '#a3cfbb';
-        if (minutes > 180) color = '#198754';
-        if (minutes > 300) color = '#0f5132';
+        let color = '#f8f9fa'; // Default: Future / Empty
+
+        if (day <= todayDay) {
+            if (minutes === 0) {
+                color = '#dc3545'; // Red: Missed / No Activity
+            } else {
+                // Green: Activity
+                color = '#d1e7dd';
+                if (minutes > 60) color = '#a3cfbb';
+                if (minutes > 180) color = '#198754';
+                if (minutes > 300) color = '#0f5132';
+            }
+        }
 
         const dot = document.createElement('div');
         dot.style.width = '12px';
         dot.style.height = '12px';
         dot.style.borderRadius = '2px';
         dot.style.backgroundColor = color;
-        dot.setAttribute('title', `${d.toLocaleDateString()}: ${Math.round(minutes)} mins`);
+        dot.setAttribute('title', `${key}: ${Math.round(minutes)} mins`);
         container.appendChild(dot);
     }
 }

@@ -205,6 +205,22 @@ function setupTrackerEvents(user) {
                         select.appendChild(opt);
                     });
                 });
+
+                // --- Handle URL Query Params (e.g. ?subject=DSA) ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const preSelectSubject = urlParams.get('subject');
+
+                if (preSelectSubject && subjects.includes(preSelectSubject)) {
+                    console.log("[Tracker] Pre-selecting subject:", preSelectSubject);
+
+                    if (taskSubjectSelect) taskSubjectSelect.value = preSelectSubject;
+
+                    if (logSubjectSelect) {
+                        logSubjectSelect.value = preSelectSubject;
+                        // Trigger change to update topics
+                        updateTopicDropdown(preSelectSubject);
+                    }
+                }
             }
         } catch (err) {
             console.error("Error loading interests:", err);

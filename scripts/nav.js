@@ -38,6 +38,9 @@ export function loadNav() {
                 <a href="mock-interviews.html" class="list-group-item list-group-item-action bg-transparent ${isActive('mock-interviews')}">
                     <i class="fas fa-user-tie me-2"></i>Mock Interviews
                 </a>
+                <a href="ai-mentor.html" class="list-group-item list-group-item-action bg-transparent ${isActive('ai-mentor')}">
+                    <i class="fas fa-robot me-2"></i>AI Mentor
+                </a>
                 <a href="#" id="menu-logout" class="list-group-item list-group-item-action bg-transparent text-danger fw-bold mt-5">
                     <i class="fas fa-power-off me-2"></i>Logout
                 </a>
@@ -63,7 +66,7 @@ export function loadNav() {
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 me-5">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle second-text fw-bold" href="#" id="navbarDropdown"
                                 role="button" data-bs-toggle="dropdown" aria-expanded="false">

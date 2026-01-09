@@ -21,6 +21,180 @@
             max-width: 400px;
             width: 100%;
         }
+
+        /* Text Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        /* Apply animations to elements */
+        .login-brand {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .login-illustration {
+            animation: scaleIn 1s ease-out 0.3s both;
+        }
+
+        .login-form-wrapper h2 {
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 50%, #4c1d95 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 0.8s ease-out 0.2s both, shimmer 3s linear infinite;
+        }
+
+        .login-form-wrapper p {
+            animation: fadeIn 1s ease-out 0.4s both;
+        }
+
+        .login-form-wrapper h6 {
+            animation: slideInLeft 0.6s ease-out 0.5s both;
+        }
+
+        .mb-3:nth-of-type(1) {
+            animation: fadeInUp 0.6s ease-out 0.6s both;
+        }
+
+        .mb-3:nth-of-type(2) {
+            animation: fadeInUp 0.6s ease-out 0.7s both;
+        }
+
+        .mb-3:nth-of-type(3) {
+            animation: fadeInUp 0.6s ease-out 0.8s both;
+        }
+
+        .mb-3:nth-of-type(4) {
+            animation: fadeInUp 0.6s ease-out 0.9s both;
+        }
+
+        #btn-register {
+            animation: fadeInUp 0.6s ease-out 1s both;
+            transition: all 0.3s ease;
+        }
+
+        #btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 29, 149, 0.3);
+        }
+
+        .mt-4 {
+            animation: fadeIn 1s ease-out 1.1s both;
+        }
+
+        /* Form label animations on focus */
+        .form-label {
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .form-control:focus+.form-label,
+        .form-control:focus~.form-label {
+            transform: translateX(5px);
+            color: var(--aesthetic-primary);
+        }
+
+        /* Input animations */
+        .form-control {
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            transform: translateY(-2px);
+        }
+
+        /* Error message animation */
+        #error-message {
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        /* Stagger animation for form inputs */
+        .text-start {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .text-start:nth-child(1) {
+            animation-delay: 0.6s;
+        }
+
+        .text-start:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+
+        .text-start:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+
+        .text-start:nth-child(4) {
+            animation-delay: 0.9s;
+        }
     </style>
 </head>
 
@@ -55,16 +229,17 @@
                 <form id="register-form">
                     <div class="mb-3 text-start">
                         <label class="form-label fw-bold text-secondary small">Full Name</label>
-                        <input type="text" class="form-control" id="fullname" required placeholder="John Doe">
+                        <input type="text" class="form-control" id="fullname" required placeholder="Enter the name">
                     </div>
                     <div class="mb-3 text-start">
                         <label class="form-label fw-bold text-secondary small">Email address</label>
-                        <input type="email" class="form-control" id="email" required placeholder="name@example.com">
+                        <input type="email" class="form-control" id="email" required placeholder="Enter the email">
                     </div>
                     <div class="mb-3 text-start">
                         <label class="form-label fw-bold text-secondary small">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" required placeholder="••••••••">
+                            <input type="password" class="form-control" id="password" required
+                                placeholder="Enter the password">
                             <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword"
                                 style="border-color: var(--aesthetic-border); background-color: #f3f4f6;">
                                 <i class="fas fa-eye text-muted"></i>
@@ -75,7 +250,7 @@
                         <label class="form-label fw-bold text-secondary small">Confirm Password</label>
                         <div class="input-group">
                             <input type="password" class="form-control" id="confirm-password" required
-                                placeholder="••••••••">
+                                placeholder="Enter the password again">
                             <button class="btn btn-outline-secondary border-start-0" type="button"
                                 id="toggleConfirmPassword"
                                 style="border-color: var(--aesthetic-border); background-color: #f3f4f6;">

@@ -9,9 +9,10 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Replaced main.css with modern-theme.css -->
     <link href="styles/modern-theme.css" rel="stylesheet">
+    <link href="styles/cursor.css" rel="stylesheet">
 </head>
 
-<body class="bg-light">
+<body class="bg-light animated-background">
 
     <!-- Nav Injector -->
     <div id="nav-placeholder"></div>
@@ -34,8 +35,10 @@
         import { loadNav } from './scripts/nav.js';
         import { setupAuthObserver } from './scripts/auth-guard.js';
         import { initVault } from './scripts/vault.js';
+        import { initCursor } from './scripts/cursor.js';
 
         loadNav();
+        initCursor();
 
         setupAuthObserver((user) => {
             initVault(user);

@@ -9,15 +9,16 @@ export function initInterviews() {
     if (!container) return;
 
     container.innerHTML = `
-        <div class="doc-hero">
+        <div class="doc-hero" style="padding: 2rem 0 1rem;">
             <div class="doc-container">
                 <h1>Mock Interviews</h1>
                 <p>Record your performance, feedback, and growth over time.</p>
             </div>
+            </div>
         </div>
 
         <div class="doc-container">
-            <div class="row g-5">
+            <div class="row g-4">
                  <!-- Left: Form -->
                  <div class="col-lg-4 order-lg-last">
                     <div class="doc-card sticky-lg-top" style="top: 2rem;">
@@ -49,7 +50,7 @@ export function initInterviews() {
 
                  <!-- Right: list -->
                  <div class="col-lg-8">
-                    <h3 class="mb-4 fw-bold">Recent History</h3>
+                    <h3 class="mb-4 fw-bold" id="recent-history-header">Recent History</h3>
                     <div id="interview-list" class="d-flex flex-column gap-3">
                         <div class="text-center py-5 text-muted">Loading history...</div>
                     </div>
@@ -68,29 +69,29 @@ export function initInterviews() {
                     <div class="modal-body p-4">
                         <form id="edit-interview-form">
                             <input type="hidden" id="edit-id">
-                            <div class="mb-3">
-                                <label class="text-label mb-1">Company / Peer</label>
-                                <input type="text" class="form-control" id="edit-company" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="text-label mb-1">Role</label>
-                                <input type="text" class="form-control" id="edit-role" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="text-label mb-1">Score (1-10)</label>
-                                <div class="d-flex align-items-center gap-3">
-                                    <input type="range" class="form-range" min="1" max="10" id="edit-score" oninput="this.nextElementSibling.value = this.value">
-                                    <output class="fw-bold fs-5">5</output>
+                                <div class="mb-3">
+                                    <label class="text-label mb-1">Company / Peer</label>
+                                    <input type="text" class="form-control" id="edit-company" required>
                                 </div>
-                            </div>
-                            <div class="mb-4">
-                                <label class="text-label mb-1">Feedback</label>
-                                <textarea class="form-control" rows="3" id="edit-feedback"></textarea>
-                            </div>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-doc-primary w-100">Update Log</button>
-                            </div>
+                                <div class="mb-3">
+                                    <label class="text-label mb-1">Role</label>
+                                    <input type="text" class="form-control" id="edit-role" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="text-label mb-1">Score (1-10)</label>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <input type="range" class="form-range" min="1" max="10" id="edit-score" oninput="this.nextElementSibling.value = this.value">
+                                            <output class="fw-bold fs-5">5</output>
+                                    </div>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="text-label mb-1">Feedback</label>
+                                    <textarea class="form-control" rows="3" id="edit-feedback"></textarea>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-doc-primary w-100">Update Log</button>
+                                </div>
                         </form>
                     </div>
                 </div>
@@ -151,31 +152,35 @@ function setupInterviewEvents(user) {
     });
 
     // Handle Edit Submit
-    editForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const id = document.getElementById('edit-id').value;
-        const company = document.getElementById('edit-company').value;
-        const role = document.getElementById('edit-role').value;
-        const score = document.getElementById('edit-score').value;
-        const feedback = document.getElementById('edit-feedback').value;
-        const submitBtn = editForm.querySelector('button[type="submit"]');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('edit-id').value;
+            const company = document.getElementById('edit-company').value;
+            const role = document.getElementById('edit-role').value;
+            const score = document.getElementById('edit-score').value;
+            const feedback = document.getElementById('edit-feedback').value;
+            const submitBtn = editForm.querySelector('button[type="submit"]');
 
-        try {
-            submitBtn.disabled = true;
-            await updateDoc(doc(db, "mock_interviews", id), {
-                company,
-                role,
-                score: parseInt(score),
-                feedback
-            });
-            if (editModal) editModal.hide();
-        } catch (error) {
-            console.error("Error updating log: ", error);
-            alert("Error: " + error.message);
-        } finally {
-            submitBtn.disabled = false;
-        }
-    });
+            try {
+                submitBtn.disabled = true;
+                await updateDoc(doc(db, "mock_interviews", id), {
+                    company,
+                    role,
+                    score: parseInt(score),
+                    feedback
+                });
+                if (editModal) editModal.hide();
+            } catch (error) {
+                console.error("Error updating log: ", error);
+                alert("Error: " + error.message);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    } else {
+        console.error("Edit form not found in DOM!");
+    }
 
     // Real-time List
     // Removed orderBy to avoid index requirement
@@ -185,6 +190,7 @@ function setupInterviewEvents(user) {
     );
 
     onSnapshot(q, (snapshot) => {
+        console.log("[Interviews] Snapshot received. Docs:", snapshot.size);
         logsContainer.innerHTML = '';
 
         if (snapshot.empty) {
@@ -212,7 +218,7 @@ function setupInterviewEvents(user) {
                 year: 'numeric', month: 'short', day: 'numeric'
             }) : 'Just now';
 
-            // Score Coloring Logic
+            // Score Coloring
             let scoreClass = 'bg-secondary';
             if (data.score <= 3) scoreClass = 'bg-danger';
             else if (data.score <= 7) scoreClass = 'bg-warning text-dark';
@@ -220,6 +226,8 @@ function setupInterviewEvents(user) {
 
             const card = document.createElement('div');
             card.className = 'doc-card p-4 position-relative';
+
+            // Build HTML safely
             card.innerHTML = `
                 <div class="position-absolute top-0 end-0 m-3 d-flex gap-1">
                     <button class="btn btn-sm btn-link text-primary edit-btn" title="Edit">
@@ -235,7 +243,7 @@ function setupInterviewEvents(user) {
                              <i class="fas fa-building text-primary fs-4"></i>
                          </div>
                          <div>
-                            <h4 class="fw-bold m-0 text-dark">${data.company}</h4>
+                            <h4 class="fw-bold m-0">${data.company}</h4>
                             <span class="text-muted small">${date} &bull; ${data.role}</span>
                          </div>
                     </div>
@@ -243,7 +251,7 @@ function setupInterviewEvents(user) {
                         ${data.score}/10
                     </div>
                 </div>
-                <div class="p-3 bg-light rounded-3 text-dark border-start border-4 ${data.score <= 3 ? 'border-danger' : (data.score <= 7 ? 'border-warning' : 'border-success')}" style="min-height: 50px;">
+                <div class="p-3 bg-light rounded-3 border-start border-4 ${data.score <= 3 ? 'border-danger' : (data.score <= 7 ? 'border-warning' : 'border-success')}" style="min-height: 50px;">
                     <div class="fw-bold mb-1 small text-uppercase opacity-50"><i class="fas fa-comment-alt me-1"></i> Feedback</div>
                     <div class="fst-italic">${data.feedback || 'No feedback recorded.'}</div>
                 </div>
@@ -251,13 +259,16 @@ function setupInterviewEvents(user) {
 
             // Edit Event
             card.querySelector('.edit-btn').onclick = () => {
-                document.getElementById('edit-id').value = id;
-                document.getElementById('edit-company').value = data.company;
-                document.getElementById('edit-role').value = data.role;
-                document.getElementById('edit-score').value = data.score;
-                document.getElementById('edit-score').nextElementSibling.value = data.score;
-                document.getElementById('edit-feedback').value = data.feedback || '';
-                if (editModal) editModal.show();
+                const idInput = document.getElementById('edit-id');
+                if (idInput) {
+                    idInput.value = id;
+                    document.getElementById('edit-company').value = data.company;
+                    document.getElementById('edit-role').value = data.role;
+                    document.getElementById('edit-score').value = data.score;
+                    document.getElementById('edit-score').nextElementSibling.value = data.score;
+                    document.getElementById('edit-feedback').value = data.feedback || '';
+                    if (editModal) editModal.show();
+                }
             };
 
             // Delete Event
@@ -269,5 +280,11 @@ function setupInterviewEvents(user) {
 
             logsContainer.appendChild(card);
         });
+    }, (error) => {
+        console.error("Error fetching interviews:", error);
+        logsContainer.innerHTML = `
+            <div class="alert alert-danger">
+                Error loading history: ${error.message}
+            </div>`;
     });
 }
